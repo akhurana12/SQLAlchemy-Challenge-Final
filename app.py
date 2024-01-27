@@ -1,7 +1,6 @@
 # Import the dependencies.
-from tkinter import SE
 import numpy as np
-import re
+import pandas as pd
 import datetime as dt
 
 import sqlalchemy
@@ -23,8 +22,10 @@ Base = automap_base()
 Base.prepare(engine, reflect=True)
 
 # Save references to each table
-Measurement = Base.classes.Measurement
+measurement = Base.classes.measurement
 station = Base.classes.station
+
+
 
 # Create our session (link) from Python to the DB
 session = Session(engine)
@@ -59,10 +60,10 @@ def precipitation():
         session=Session(engine)
         year_ago=dt.date(2017, 8, 23)-dt.timedelta(days=365)
         one_year_previous_date =dt.date(year_ago.year, year_ago.month, year_ago.day)
-        precipitation_scores = session.query(Measurement.date, func.max(Measurement.prcp)).\
-            filter(Measurement.date >= func.strftime("%Y-%m-%d", one_year_previous_date)).\
-            group_by(Measurement.date).order_by(Measurement.date).all()
-        session.close
+        precipitation_scores = session.query(measurement.date, func.max(measurement.prcp)).\
+            filter(measurement.date >= func.strftime("%Y-%m-%d", one_year_previous_date)).\
+            group_by(measurement.date).order_by(measurement.date).all()
+        session.close()
         
         dictionary=dict(precipitation_scores)
         return jsonify(dictionary)
